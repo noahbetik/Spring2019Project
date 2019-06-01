@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from ev3dev2.motor import *
 from time import sleep
 from PID import PID
@@ -10,12 +12,17 @@ liftAction = PID(0.3, 0.25, 0, 0, LargeMotor(OUTPUT_B))
 
 while True:
 
-    while (targetState == False):
+    if (targetState == False):
         spinAction.search()
 
-    if (targetState == True):
+    elif (targetState == True):
         liftAction.pos()
         spinAction.pos()
+
+    else:
+        spinAction.worldHasEnded()
+
+
 
 
 # need some vision/motion integration to change targetState

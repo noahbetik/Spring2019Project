@@ -54,4 +54,8 @@ class PID:
         elif (self.m.position <= 360):
             self.m.on(SpeedRPM(-30))
 
+    def worldHasEnded(self):
+        self.m.on(SpeedRPM(175))
+        print("THE WORLD HAS ENDED")
+
 #yippity yee, get out of my tree
