@@ -4,11 +4,11 @@ from ev3dev2.motor import *
 from time import sleep
 from PID import PID
 
-targetState = False
+targetState = True
+#errorAngle = int(input())   prototyping code for now, will actually pull offset angle from vision tracking
 
-
-spinAction = PID(0.3, 0.25, 0, 0, LargeMotor(OUTPUT_A))
-liftAction = PID(0.3, 0.25, 0, 0, LargeMotor(OUTPUT_B))
+spinAction = PID(0.3, 0.25, 0, 0, 0, LargeMotor(OUTPUT_A))
+liftAction = PID(0.3, 0.25, 0, 0, 0, LargeMotor(OUTPUT_B))
 
 while True:
 
@@ -16,8 +16,8 @@ while True:
         spinAction.search()
 
     elif (targetState == True):
-        liftAction.pos()
         spinAction.pos()
+        liftAction.pos()
 
     else:
         spinAction.worldHasEnded()
