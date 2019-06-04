@@ -3,6 +3,7 @@
 from ev3dev2.motor import *
 from time import sleep
 from PID import PID
+from trigger import buttonBop
 
 targetState = True
 #errorAngle = int(input())   prototyping code for now, will actually pull offset angle from vision tracking
@@ -18,6 +19,9 @@ while True:
     elif (targetState == True):
         spinAction.pos()
         liftAction.pos()
+        if errorAngle == 0:
+            buttonBop()
+            targetState = False
 
     else:
         spinAction.worldHasEnded()
