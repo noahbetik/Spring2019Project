@@ -17,13 +17,14 @@ class PID:
         self.m = m
 
 
-    def pos(self):
+    def pos(self, errorAngle):
         #self.setPoint = int(input())   prototyping code
         encoderPos = self.m.position
-        self.setPoint = encoderPos - self.errorAngle
+        self.setPoint = encoderPos - errorAngle
         self.m.stop_action = 'coast'
         while (encoderPos != self.setPoint):
             encoderPos = self.m.position
+            #self.setPoint = encoderPos - errorAngle   --> maybe makes janky live tracking work
             error = self.setPoint - encoderPos
             self.outputSpeed = (error * self.KP) + (self.previousError * self.KD) + (self.errorSum * self.KI)
             if (self.outputSpeed > 175):
@@ -36,7 +37,7 @@ class PID:
             print(self.m.position)
 
     def search(self):
-        if (self.m.position >= 0):
+        if (0 <= self.m.position <= 360):
             self.m.on(SpeedRPM(30))
         elif (self.m.position <= 360):
             self.m.on(SpeedRPM(-30))

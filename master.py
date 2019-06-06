@@ -7,7 +7,7 @@ from trigger import buttonBop
 import serial
 
 targetState = False
-errorAngle = 0   #prototyping code for now, will actually pull offset angle from vision tracking
+errorAngleSpin, errorAngleLift = 0, 0   #prototyping code for now, will actually pull offset angle from vision tracking
 port = "\\\\.\\CNCA0" #example port, update once found
 ser = serial.Serial(port, 38400, timeout=0)
 
@@ -17,8 +17,8 @@ liftAction = PID(0.3, 0.25, 0, 0, 0, LargeMotor(OUTPUT_B))
 def receive():
     data = ser.read(9999)
     if len(data) > 0:
-        errorAngle = data
-        print (errorAngle)
+        errorAngleSpin, errorAngleLift = data.split()
+        print (errorAngleSpin, errorAngleLift)
     else:
         print ("no target received")
 
@@ -29,9 +29,9 @@ while True:
         receive()
 
     elif (targetState == True):
-        spinAction.pos()
-        liftAction.pos()
-        if errorAngle == 0:
+        spinAction.pos(errorAngleSpin)
+        liftAction.pos(errorAngleLift)
+        if errorAngleSpin == 0 and errorAngleLift == 0:
             buttonBop()
             targetState = False
 
