@@ -20,12 +20,10 @@ class PID:
     def pos(self, offset):
         #self.setPoint = int(input())   prototyping code
         encoderPos = self.m.position
-        self.setPoint = encoderPos - offset
+        self.setPoint = offset
         self.m.stop_action = 'coast'
-        while (encoderPos != self.setPoint):
-            encoderPos = self.m.position
-            #self.setPoint = encoderPos - offset   --> maybe makes janky live tracking work
-            error = self.setPoint - encoderPos
+        if self.setPoint != 0:
+            error = self.setPoint
             self.outputSpeed = (error * self.KP) + (self.previousError * self.KD) + (self.errorSum * self.KI)
             if (self.outputSpeed > 175):
                 self.outputSpeed = 175

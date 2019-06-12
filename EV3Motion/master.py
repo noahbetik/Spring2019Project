@@ -2,12 +2,12 @@
 
 from ev3dev2.motor import *
 from time import sleep
-from PID import PID
+from pixelPID import PID
 from trigger import buttonBop
 import serial
 
 targetState = False
-errorAngleSpin, errorAngleLift = 0, 0   #prototyping code for now, will actually pull offset angle from vision tracking
+offsetSpin, offsetLift = 0, 0   #prototyping code for now, will actually pull offset angle from vision tracking
 port = "\\\\.\\CNCA0" #example port, update once found
 ser = serial.Serial(port, 38400, timeout=0)
 
@@ -17,8 +17,9 @@ liftAction = PID(0.3, 0.25, 0, 0, 0, LargeMotor(OUTPUT_B))
 def receive():
     data = ser.read(9999)
     if len(data) > 0:
-        errorAngleSpin, errorAngleLift = data.split()
-        print (errorAngleSpin, errorAngleLift)
+        offsetSpin, offsetLift = data.split()
+        print (offsetSpin, offsetLift)
+        targetState = True
     else:
         print ("no target received")
 
@@ -29,21 +30,15 @@ while True:
         receive()
 
     elif (targetState == True):
-        spinAction.pos(errorAngleSpin)
-        liftAction.pos(errorAngleLift)
-        if errorAngleSpin == 0 and errorAngleLift == 0:
-            buttonBop()
-            targetState = False
+        while targetState == True:
+            receive()
+            spinAction.pos(offsetSpin)
+            liftAction.pos(offsetLift)
+            receive()
+            if offsetSpin == 0 and offsetLift == 0:
+                buttonBop()
+                targetState = False
 
     else:
         spinAction.worldHasEnded()
         ser.close
-
-
-
-
-# need some vision/motion integration to change targetState
-# currently can only move to static target, doesn't live-check while running PID loop
-
-
-
