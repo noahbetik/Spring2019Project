@@ -6,8 +6,8 @@ from pixelPID import PID
 from trigger import buttonBop
 import socket
 
-HOST = ''
-PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
+HOST = '169.254.26.214'
+PORT = 65433        # Port to listen on (non-privileged ports are > 1023)
 targetState = False
 offsetSpin, offsetLift = 0, 0   #prototyping code for now, will actually pull offset angle from vision tracking
 
@@ -18,15 +18,20 @@ spinAction = PID(0.3, 0.25, 0, 0, 0, LargeMotor(OUTPUT_A))
 liftAction = PID(0.3, 0.25, 0, 0, 0, LargeMotor(OUTPUT_B))
 
 def receive():
-    while True:
+#    while True:
+        global targetState
+        global offsetLift
+        global offsetSpin
         data, addr = sock.recvfrom(1024)
         data = data.decode('utf-8')
         if data == "q":
                 sock.close()
-                break
-        print (data) # one two testing
+                return
+                #break
+        targetState = True
+        #print (data) # one two testing
         offsetSpin, offsetLift = map(int, data.split())
-        print (offsetSpin, "/n", offsetLift) # proto proto code
+        print (offsetSpin, offsetLift) # proto proto code
 
 
 while True:
@@ -37,7 +42,6 @@ while True:
 
     elif (targetState == True):
         while targetState == True:
-            receive()
             spinAction.pos(offsetSpin)
             liftAction.pos(offsetLift)
             receive()
